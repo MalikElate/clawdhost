@@ -1,0 +1,48 @@
+#cloud-config
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker.io
+  - docker-compose
+  - nodejs
+  - npm
+
+runcmd:
+  # Enable Docker
+  - systemctl enable docker
+  - systemctl start docker
+  - usermod -aG docker ubuntu
+
+  # Install Node.js 22 (LTS)
+  - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+  - apt-get install -y nodejs
+
+  # Pull Moltbot image
+  - docker pull moltbot/moltbot:latest
+
+  # Create app directory
+  - mkdir -p /opt/clawdhost
+  - chown ubuntu:ubuntu /opt/clawdhost
+
+write_files:
+  - path: /etc/systemd/system/clawdhost.service
+    content: |
+      [Unit]
+      Description=ClawdHost Backend
+      After=network.target docker.service
+      Requires=docker.service
+
+      [Service]
+      Type=simple
+      User=ubuntu
+      WorkingDirectory=/opt/clawdhost
+      ExecStart=/usr/bin/node server/index.js
+      Restart=always
+      RestartSec=10
+      Environment=NODE_ENV=production
+
+      [Install]
+      WantedBy=multi-user.target
+
+final_message: "ClawdHost VM is ready! Elapsed: $UPTIME seconds"

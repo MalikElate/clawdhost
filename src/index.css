@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* Custom theme */
+@theme {
+  --color-brand-50: #fef3f2;
+  --color-brand-100: #fee4e2;
+  --color-brand-200: #ffccc8;
+  --color-brand-300: #fea8a1;
+  --color-brand-400: #fb7669;
+  --color-brand-500: #f24b3b;
+  --color-brand-600: #e02e1d;
+  --color-brand-700: #bc2314;
+  --color-brand-800: #9b2114;
+  --color-brand-900: #812218;
+  --color-brand-950: #460d08;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100;
+}
