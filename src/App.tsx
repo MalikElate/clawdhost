@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { SignedIn, SignedOut, RedirectToSignIn } from '@clerk/clerk-react'
-import Landing from './pages/Landing'
+import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Chat from './pages/Chat'
 import SignIn from './pages/SignIn'
@@ -21,7 +21,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<Home />} />
         <Route path="/sign-in/*" element={<SignIn />} />
         <Route path="/sign-up/*" element={<SignUp />} />
         <Route
