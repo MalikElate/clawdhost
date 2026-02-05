@@ -4,15 +4,9 @@ import MessageInput from './MessageInput'
 
 interface ChatWindowProps {
   instanceId: string
-  requireAuth?: boolean
-  requireBeta?: boolean
 }
 
-export default function ChatWindow({
-  instanceId,
-  requireAuth = false,
-  requireBeta = false,
-}: ChatWindowProps) {
+export default function ChatWindow({ instanceId }: ChatWindowProps) {
   const { messages, isConnected, isConnecting, sendMessage } = useWebSocket({
     instanceId,
   })
@@ -43,12 +37,7 @@ export default function ChatWindow({
       <MessageList messages={messages} />
 
       {/* Input */}
-      <MessageInput
-        onSend={sendMessage}
-        disabled={!isConnected}
-        requireAuth={requireAuth}
-        requireBeta={requireBeta}
-      />
+      <MessageInput onSend={sendMessage} disabled={!isConnected} />
     </div>
   )
 }
