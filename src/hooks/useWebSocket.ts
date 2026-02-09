@@ -18,8 +18,21 @@ export function useWebSocket({ instanceId }: UseWebSocketOptions) {
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${protocol}//${window.location.host}/api/ws/${instanceId}`
+    // Build WebSocket URL based on environment
+    const getWebSocketUrl = (id: string): string => {
+      const apiUrl = import.meta.env.VITE_API_URL
+      if (apiUrl) {
+        // Production: use configured backend URL
+        const url = new URL(apiUrl)
+        const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+        return `${protocol}//${url.host}/api/ws/${id}`
+      }
+      // Development: use same-origin connection
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+      return `${protocol}//${window.location.host}/api/ws/${id}`
+    }
+
+    const wsUrl = getWebSocketUrl(instanceId)
 
     setIsConnecting(true)
     const ws = new WebSocket(wsUrl)

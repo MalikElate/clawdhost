@@ -50,9 +50,9 @@ export default function Home() {
             // Show access request message
             <div className="h-full flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50">
               <div className="text-center max-w-md">
-                <div className="text-4xl mb-4">🦞</div>
+                <div className="text-4xl mb-4">🌻</div>
                 <h2 className="text-2xl font-bold text-white mb-4">
-                  ClawdHost
+                  SunnyBot
                 </h2>
                 <p className="text-slate-300 mb-6">
                   {isSignedIn

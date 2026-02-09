@@ -1,8 +1,8 @@
-# 🦞 ClawdHost
+# 🌻 SunnyBot
 
-**Your AI. Your Cloud. Your Claw.**
+**deploy moltbot to a vpc**
 
-ClawdHost is a self-service portal for deploying and managing personal [Moltbot](https://molt.bot/) AI assistant instances. Create your own isolated Moltbot container, manage it from a beautiful dashboard, and chat with your AI in real-time.
+SunnyBot is a self-service portal for deploying and managing personal [Moltbot](https://molt.bot/) AI assistant instances. Create your own isolated Moltbot container, manage it from a beautiful dashboard, and chat with your AI in real-time.
 
 ## ✨ Features
 
@@ -15,7 +15,7 @@ ClawdHost is a self-service portal for deploying and managing personal [Moltbot]
 
 ## ⚠️ Beta Access
 
-ClawdHost is currently in **beta**. New users cannot deploy instances by default.
+SunnyBot is currently in **beta**. New users cannot deploy instances by default.
 
 **To request beta access, contact:** `pluto-software.chirping353@passinbox.com`
 
@@ -53,7 +53,7 @@ Beta access allows you to:
 
 4. **Get Clerk API Keys**
    - Go to [https://dashboard.clerk.com/](https://dashboard.clerk.com/)
-   - Create a new application named "ClawdHost"
+   - Create a new application named "SunnyBot"
    - Copy your API keys and add them to `.env`:
      ```env
      VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
@@ -148,4 +148,4 @@ For questions, issues, or feature requests, contact: `pluto-software.chirping353
 
 ---
 
-Built with 🦞 by the ClawdHost team. Powered by [Moltbot](https://molt.bot/).
+Built with 🌻 by the SunnyBot team. Powered by [Moltbot](https://molt.bot/).

@@ -8,8 +8,8 @@ export default function SignIn() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl">🦞</span>
-              <span className="text-xl font-bold text-white">ClawdHost</span>
+              <span className="text-2xl">🌻</span>
+              <span className="text-xl font-bold text-white">SunnyBot</span>
             </Link>
           </div>
         </div>

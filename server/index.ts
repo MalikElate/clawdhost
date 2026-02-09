@@ -20,7 +20,15 @@ const PORT = process.env.PORT || 3001
 initDb()
 
 // Middleware
-app.use(cors())
+// Configure CORS to allow frontend from different domain (e.g., Vercel)
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
+  : ['http://localhost:5173']
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}))
 app.use(express.json())
 app.use(clerkMiddleware())
 

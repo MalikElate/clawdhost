@@ -1,4 +1,7 @@
-const API_BASE = '/api'
+// Support environment-based API URL for cross-origin requests
+// In production (Vercel), use VITE_API_URL from environment
+// In development, fall back to same-origin /api path
+const API_BASE = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api'
 
 export interface Instance {
   id: string

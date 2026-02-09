@@ -12,7 +12,7 @@ export default function BetaAccessBanner({ contactEmail }: BetaAccessBannerProps
             Beta Access Required
           </h2>
           <p className="text-slate-300 mb-4">
-            ClawdHost is currently in beta. You don't have access to deploy instances yet.
+            SunnyBot is currently in beta. You don't have access to deploy instances yet.
           </p>
           <p className="text-slate-400 mb-4">
             To request beta access and start deploying your Moltbot instances, contact:
@@ -22,7 +22,7 @@ export default function BetaAccessBanner({ contactEmail }: BetaAccessBannerProps
               {contactEmail}
             </code>
             <a
-              href={`mailto:${contactEmail}?subject=ClawdHost Beta Access Request`}
+              href={`mailto:${contactEmail}?subject=SunnyBot Beta Access Request`}
               className="rounded-lg bg-yellow-600 px-4 py-2 text-white hover:bg-yellow-500 transition"
             >
               Send Email

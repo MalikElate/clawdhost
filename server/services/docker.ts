@@ -37,7 +37,7 @@ export async function createContainer(
     const mockContainerId = `mock-${instanceId}`
     mockContainers.set(mockContainerId, {
       id: mockContainerId,
-      name: `clawdhost-${instanceId}`,
+      name: `sunnybot-${instanceId}`,
       status: 'running',
       port: generateMockPort(),
     })
@@ -67,10 +67,10 @@ export async function createContainer(
   // Create container
   const container = await docker.createContainer({
     Image: MOLTBOT_IMAGE,
-    name: `clawdhost-${instanceId}`,
+    name: `sunnybot-${instanceId}`,
     Labels: {
-      'clawdhost.instance-id': instanceId,
-      'clawdhost.name': name,
+      'sunnybot.instance-id': instanceId,
+      'sunnybot.name': name,
     },
     Env: [
       `INSTANCE_ID=${instanceId}`,

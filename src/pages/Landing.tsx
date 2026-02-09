@@ -9,8 +9,8 @@ export default function Landing() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-2xl">🦞</span>
-              <span className="text-xl font-bold text-white">ClawdHost</span>
+              <span className="text-2xl">🌻</span>
+              <span className="text-xl font-bold text-white">SunnyBot</span>
             </div>
             <nav className="flex items-center gap-4">
               <SignedOut>
@@ -45,10 +45,8 @@ export default function Landing() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
           <h1 className="text-5xl font-bold text-white sm:text-6xl lg:text-7xl">
-            Your AI.{' '}
-            <span className="text-brand-400">Your Cloud.</span>
-            <br />
-            Your Claw.
+            deploy moltbot to a{' '}
+            <span className="text-brand-400">vpc</span>
           </h1>
           <p className="mt-6 text-xl text-slate-300 max-w-2xl mx-auto">
             Deploy your personal Moltbot AI assistant in seconds.
@@ -112,7 +110,7 @@ export default function Landing() {
       <footer className="border-t border-slate-700/50 py-8">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <p className="text-center text-slate-500">
-            © 2026 ClawdHost. Powered by Moltbot.
+            © 2026 SunnyBot. Powered by Moltbot.
           </p>
         </div>
       </footer>

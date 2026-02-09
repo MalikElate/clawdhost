@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ClawdHost** is a self-service portal for managing Moltbot AI assistant instances. Users can create, manage, and interact with Docker containers running Moltbot instances through a web interface.
+**SunnyBot** is a self-service portal for managing Moltbot AI assistant instances. Users can create, manage, and interact with Docker containers running Moltbot instances through a web interface.
 
 ## Development Commands
 

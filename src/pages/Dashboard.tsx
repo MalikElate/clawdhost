@@ -110,7 +110,7 @@ export default function Dashboard() {
                 You don't have access to create instances yet. Please contact the team to request beta access.
               </p>
               <a
-                href={`mailto:${BETA_CONTACT_EMAIL}?subject=ClawdHost Beta Access Request`}
+                href={`mailto:${BETA_CONTACT_EMAIL}?subject=SunnyBot Beta Access Request`}
                 className="rounded-lg bg-brand-600 px-6 py-2 text-white hover:bg-brand-500 transition inline-block"
               >
                 Request Access
@@ -118,7 +118,7 @@ export default function Dashboard() {
             </div>
           ) : instances.length === 0 ? (
             <div className="rounded-xl bg-slate-800/50 border border-slate-700/50 p-12 text-center">
-              <div className="text-4xl mb-4">🦞</div>
+              <div className="text-4xl mb-4">🌻</div>
               <h2 className="text-xl font-semibold text-white mb-2">
                 No instances yet
               </h2>

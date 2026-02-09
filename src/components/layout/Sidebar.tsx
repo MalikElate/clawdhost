@@ -11,8 +11,8 @@ export default function Sidebar() {
     <aside className="w-64 bg-slate-800 border-r border-slate-700/50 flex flex-col">
       <div className="p-4 border-b border-slate-700/50">
         <Link to="/" className="flex items-center gap-2">
-          <span className="text-2xl">🦞</span>
-          <span className="text-xl font-bold text-white">ClawdHost</span>
+          <span className="text-2xl">🌻</span>
+          <span className="text-xl font-bold text-white">SunnyBot</span>
         </Link>
       </div>
       <nav className="flex-1 p-4">
