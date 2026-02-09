@@ -7,25 +7,81 @@ packages:
   - docker-compose
   - nodejs
   - npm
+  - nginx
+  - certbot
+  - python3-certbot-nginx
+  - curl
 
 runcmd:
-  # Enable Docker
-  - systemctl enable docker
-  - systemctl start docker
-  - usermod -aG docker ubuntu
-
   # Install Node.js 22 (LTS)
   - curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
   - apt-get install -y nodejs
 
+  # Enable and start Docker
+  - systemctl enable docker
+  - systemctl start docker
+  - usermod -aG docker ubuntu
+
   # Pull Moltbot image
   - docker pull moltbot/moltbot:latest
 
-  # Create app directory
-  - mkdir -p /opt/clawdhost
-  - chown ubuntu:ubuntu /opt/clawdhost
+  # Create app directories
+  - mkdir -p /opt/clawdhost/data
+  - mkdir -p /opt/clawdhost/dist
+  - chown -R ubuntu:ubuntu /opt/clawdhost
+
+  # Enable and restart nginx
+  - systemctl enable nginx
+  - systemctl restart nginx
 
 write_files:
+  # Nginx configuration
+  - path: /etc/nginx/sites-available/clawdhost
+    content: |
+      # ClawdHost Nginx Configuration
+      server {
+          listen 80 default_server;
+          server_name _;
+
+          root /opt/clawdhost/dist;
+          index index.html index.htm;
+
+          # API and WebSocket proxy
+          location /api {
+              proxy_pass http://localhost:3001;
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection "upgrade";
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_cache_bypass $http_upgrade;
+              proxy_connect_timeout 60s;
+              proxy_send_timeout 60s;
+              proxy_read_timeout 60s;
+          }
+
+          # Static assets - cache aggressively
+          location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+              expires 1y;
+              add_header Cache-Control "public, immutable";
+              access_log off;
+          }
+
+          # SPA routing - serve index.html for all routes not matching above
+          location / {
+              try_files $uri $uri/ /index.html;
+          }
+
+          # Disable caching for index.html
+          location ~* ^/index\.html$ {
+              add_header Cache-Control "no-cache, no-store, must-revalidate";
+              expires 0;
+          }
+      }
+
+  # ClawdHost systemd service
   - path: /etc/systemd/system/clawdhost.service
     content: |
       [Unit]
@@ -37,12 +93,24 @@ write_files:
       Type=simple
       User=ubuntu
       WorkingDirectory=/opt/clawdhost
-      ExecStart=/usr/bin/node server/index.js
+      ExecStart=/usr/bin/node dist/server/index.js
       Restart=always
       RestartSec=10
-      Environment=NODE_ENV=production
+      EnvironmentFile=/opt/clawdhost/.env
 
       [Install]
       WantedBy=multi-user.target
+
+  # Environment file placeholder (to be filled by deployment)
+  - path: /opt/clawdhost/.env.template
+    owner: ubuntu:ubuntu
+    permissions: '0600'
+    content: |
+      NODE_ENV=production
+      PORT=3001
+      DATABASE_URL=/opt/clawdhost/data/clawdhost.db
+      DOCKER_SOCKET=/var/run/docker.sock
+      CLERK_SECRET_KEY=
+      VITE_CLERK_PUBLISHABLE_KEY=
 
 final_message: "ClawdHost VM is ready! Elapsed: $UPTIME seconds"

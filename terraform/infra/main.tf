@@ -88,17 +88,6 @@ resource "oci_core_security_list" "clawdhost_sl" {
     }
   }
 
-  # Allow backend API port
-  ingress_security_rules {
-    protocol    = "6"
-    source      = "0.0.0.0/0"
-    source_type = "CIDR_BLOCK"
-    tcp_options {
-      min = 3001
-      max = 3001
-    }
-  }
-
   # Allow all egress
   egress_security_rules {
     protocol         = "all"

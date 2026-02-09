@@ -1,0 +1,87 @@
+name: Deploy to Oracle Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build:all
+
+      - name: Deploy to Oracle Cloud VM
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: 'dist,package.json,package-lock.json'
+          target: '/opt/clawdhost'
+          rm: false
+          overwrite: true
+
+      - name: Create environment file on VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cat > /opt/clawdhost/.env << 'EOF'
+            NODE_ENV=production
+            PORT=3001
+            DATABASE_URL=/opt/clawdhost/data/clawdhost.db
+            DOCKER_SOCKET=/var/run/docker.sock
+            CLERK_SECRET_KEY=${{ secrets.CLERK_SECRET_KEY }}
+            VITE_CLERK_PUBLISHABLE_KEY=${{ secrets.VITE_CLERK_PUBLISHABLE_KEY }}
+            EOF
+            chmod 600 /opt/clawdhost/.env
+
+      - name: Install production dependencies on VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd /opt/clawdhost
+            npm ci --production
+
+      - name: Restart ClawdHost service
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            sudo systemctl daemon-reload
+            sudo systemctl restart clawdhost
+            sleep 2
+            sudo systemctl status clawdhost
+
+      - name: Verify deployment
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            echo "Checking service status..."
+            sudo systemctl is-active clawdhost || exit 1
+            echo "✓ ClawdHost service is active"
+            echo "Checking recent logs..."
+            sudo journalctl -u clawdhost -n 10 --no-pager

@@ -1,9 +1,29 @@
-# Oracle Cloud credentials
-tenancy_ocid     = "ocid1.tenancy.oc1..example"
-user_ocid        = "ocid1.user.oc1..example"
-fingerprint      = "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
-private_key_path = "~/.oci/oci_api_key.pem"
-region           = "us-ashburn-1"
+# Copy this file to terraform.tfvars and fill in your Oracle Cloud credentials
 
-# SSH key for VM access
-ssh_public_key = "ssh-rsa AAAA... your-key-comment"
+# Your OCI Tenancy OCID
+# Get this from: Oracle Cloud Console → Profile → Tenancy
+tenancy_ocid = "ocid1.tenancy.oc1..aaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# Your OCI User OCID
+# Get this from: Oracle Cloud Console → User Settings
+user_ocid = "ocid1.user.oc1..aaaaaaaxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# API Key Fingerprint
+# Get this from: User Settings → API Keys (shown when you create the key)
+fingerprint = "xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx"
+
+# Path to your OCI API private key
+# Download from: User Settings → API Keys → Download Private Key
+# Save to: ~/.oci/oci_api_key.pem
+private_key_path = "~/.oci/oci_api_key.pem"
+
+# Oracle Cloud region
+# Options: us-ashburn-1, us-phoenix-1, eu-frankfurt-1, ap-singapore-1, etc.
+# Use your home region (chosen during account setup)
+region = "us-ashburn-1"
+
+# SSH Public Key for VM access
+# Generate with: ssh-keygen -t rsa -b 4096 -f ~/.ssh/clawdhost -N ""
+# Get content with: cat ~/.ssh/clawdhost.pub
+# Include the entire line starting with "ssh-rsa"
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDxxxxx...xxxxx user@hostname"

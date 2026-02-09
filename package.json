@@ -9,6 +9,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
     "build": "tsc -b && vite build",
     "build:server": "tsc -p tsconfig.server.json",
+    "build:all": "npm run build && npm run build:server",
     "start": "node dist/server/index.js",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -32,6 +33,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@types/better-sqlite3": "^7.6.13",
     "@types/cors": "^2.8.19",
+    "@types/dockerode": "^4.0.1",
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

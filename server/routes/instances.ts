@@ -7,8 +7,8 @@ import {
   createInstance as dbCreateInstance,
   updateInstanceStatus,
   deleteInstance as dbDeleteInstance,
-} from '../db/sqlite'
-import { createContainer, removeContainer } from '../services/docker'
+} from '../db/sqlite.js'
+import { createContainer, removeContainer } from '../services/docker.js'
 
 const router = Router()
 
@@ -21,7 +21,7 @@ router.get('/', (req, res) => {
 
   const instances = getInstancesByUserId(userId)
   res.json(
-    instances.map((i) => ({
+    instances.map((i: any) => ({
       id: i.id,
       name: i.name,
       status: i.status,
@@ -47,10 +47,10 @@ router.post('/', async (req, res) => {
 
   // Create container in background
   createContainer(id, name)
-    .then((containerId) => {
+    .then((containerId: string) => {
       updateInstanceStatus(id, 'running', containerId)
     })
-    .catch((error) => {
+    .catch((error: any) => {
       console.error('Failed to create container:', error)
       updateInstanceStatus(id, 'error')
     })
@@ -101,7 +101,7 @@ router.delete('/:id', async (req, res) => {
     }
     dbDeleteInstance(req.params.id)
     res.status(204).send()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to delete instance:', error)
     res.status(500).json({ error: 'Failed to delete instance' })
   }

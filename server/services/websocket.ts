@@ -1,7 +1,7 @@
 import { Server as HttpServer } from 'http'
 import { WebSocketServer, WebSocket } from 'ws'
-import { getInstanceById } from '../db/sqlite'
-import { getContainerPort } from './docker'
+import { getInstanceById } from '../db/sqlite.js'
+import { getContainerPort } from './docker.js'
 
 interface ClientConnection {
   ws: WebSocket
