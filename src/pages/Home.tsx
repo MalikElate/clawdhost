@@ -137,7 +137,7 @@ export default function Home() {
         <section className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="mx-auto max-w-4xl">
             <h2 className="text-xl font-semibold text-white mb-4">Your Instance</h2>
-            <ChatWindow instanceId={activeInstance.id} serviceUrl={activeInstance.serviceUrl} />
+            <ChatWindow instanceId={activeInstance.id} serviceUrl={activeInstance.serviceUrl} gatewayToken={activeInstance.gatewayToken} />
           </div>
         </section>
       )}

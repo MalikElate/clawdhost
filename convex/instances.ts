@@ -18,6 +18,7 @@ export const list = query({
       name: i.name,
       status: i.status,
       serviceUrl: i.serviceUrl,
+      gatewayToken: i.gatewayToken,
       createdAt: i._creationTime,
     }));
   },
