@@ -4,11 +4,15 @@ import MessageInput from './MessageInput'
 
 interface ChatWindowProps {
   instanceId: string
+  serviceUrl: string
+  gatewayToken?: string
 }
 
-export default function ChatWindow({ instanceId }: ChatWindowProps) {
+export default function ChatWindow({ instanceId, serviceUrl, gatewayToken }: ChatWindowProps) {
   const { messages, isConnected, isConnecting, sendMessage } = useWebSocket({
     instanceId,
+    serviceUrl,
+    gatewayToken,
   })
 
   return (

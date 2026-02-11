@@ -9,8 +9,15 @@ export default function PublicHeader() {
           <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition">
             <span className="text-2xl">🌻</span>
             <span className="text-xl font-bold text-white">SunnyBot</span>
+            <span className="rounded-full bg-brand-500/20 px-2 py-0.5 text-xs font-medium text-brand-400">Beta</span>
           </Link>
           <nav className="flex items-center gap-4">
+            <Link
+              to="/roadmap"
+              className="text-slate-300 hover:text-white transition"
+            >
+              Roadmap
+            </Link>
             <SignedOut>
               <Link
                 to="/sign-in"

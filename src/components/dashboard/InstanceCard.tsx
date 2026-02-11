@@ -4,7 +4,8 @@ interface Instance {
   id: string
   name: string
   status: 'running' | 'stopped' | 'creating' | 'error'
-  createdAt: string
+  serviceUrl?: string
+  createdAt: number
 }
 
 interface InstanceCardProps {
@@ -32,7 +33,9 @@ export default function InstanceCard({ instance, onDelete }: InstanceCardProps) 
       <div className="flex items-start justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-white">{instance.name}</h3>
-          <p className="text-sm text-slate-500">ID: {instance.id}</p>
+          <p className="text-sm text-slate-500">
+            Created {new Date(instance.createdAt).toLocaleDateString()}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <span
@@ -43,10 +46,6 @@ export default function InstanceCard({ instance, onDelete }: InstanceCardProps) 
           </span>
         </div>
       </div>
-
-      <p className="text-sm text-slate-500 mb-4">
-        Created: {new Date(instance.createdAt).toLocaleDateString()}
-      </p>
 
       <div className="flex items-center gap-2">
         {instance.status === 'running' && (

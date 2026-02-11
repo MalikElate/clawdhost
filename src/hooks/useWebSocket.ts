@@ -9,30 +9,22 @@ export interface Message {
 
 interface UseWebSocketOptions {
   instanceId: string
+  serviceUrl: string
+  gatewayToken?: string
 }
 
-export function useWebSocket({ instanceId }: UseWebSocketOptions) {
+export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSocketOptions) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(true)
   const wsRef = useRef<WebSocket | null>(null)
 
   useEffect(() => {
-    // Build WebSocket URL based on environment
-    const getWebSocketUrl = (id: string): string => {
-      const apiUrl = import.meta.env.VITE_API_URL
-      if (apiUrl) {
-        // Production: use configured backend URL
-        const url = new URL(apiUrl)
-        const protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
-        return `${protocol}//${url.host}/api/ws/${id}`
-      }
-      // Development: use same-origin connection
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      return `${protocol}//${window.location.host}/api/ws/${id}`
+    // Connect directly to the Moltbot instance on Railway
+    let wsUrl = serviceUrl.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:') + '/ws'
+    if (gatewayToken) {
+      wsUrl += `?token=${encodeURIComponent(gatewayToken)}`
     }
-
-    const wsUrl = getWebSocketUrl(instanceId)
 
     setIsConnecting(true)
     const ws = new WebSocket(wsUrl)
@@ -74,7 +66,7 @@ export function useWebSocket({ instanceId }: UseWebSocketOptions) {
     return () => {
       ws.close()
     }
-  }, [instanceId])
+  }, [instanceId, serviceUrl, gatewayToken])
 
   const sendMessage = useCallback((content: string) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {

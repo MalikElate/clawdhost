@@ -1,10 +1,16 @@
 import { useParams, Link } from 'react-router-dom'
+import { useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 import Sidebar from '../components/layout/Sidebar'
 import Header from '../components/layout/Header'
 import ChatWindow from '../components/chat/ChatWindow'
 
 export default function Chat() {
   const { instanceId } = useParams<{ instanceId: string }>()
+  const instance = useQuery(
+    api.instances.getStatus,
+    instanceId ? { instanceId: instanceId as any } : "skip"
+  )
 
   if (!instanceId) {
     return (
@@ -36,10 +42,18 @@ export default function Chat() {
               ← Back
             </Link>
             <h1 className="text-xl font-bold text-white">
-              Chat with Instance
+              Chat with {instance?.name ?? 'Instance'}
             </h1>
           </div>
-          <ChatWindow instanceId={instanceId} />
+          {instance?.serviceUrl ? (
+            <ChatWindow instanceId={instanceId} serviceUrl={instance.serviceUrl} gatewayToken={instance.gatewayToken} />
+          ) : (
+            <div className="flex-1 flex items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700/50">
+              <p className="text-slate-400">
+                {instance === undefined ? 'Loading...' : 'Instance is not running yet.'}
+              </p>
+            </div>
+          )}
         </main>
       </div>
     </div>

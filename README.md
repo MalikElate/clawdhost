@@ -1,36 +1,30 @@
-# 🌻 SunnyBot
+# SunnyBot
 
-**deploy moltbot to a vpc**
+**Deploy OpenClaw to a VPS**
 
-SunnyBot is a self-service portal for deploying and managing personal [Moltbot](https://molt.bot/) AI assistant instances. Create your own isolated Moltbot container, manage it from a beautiful dashboard, and chat with your AI in real-time.
+SunnyBot is a self-service portal for securely deploying and managing [OpenClaw](https://openclaw.ai/) AI instances. Create your own isolated OpenClaw instance on managed infrastructure, manage it from a dashboard, and chat with your AI in real-time.
 
-## ✨ Features
+## Features
 
-- **🚀 Instant Deploy** - Spin up your personal Moltbot instance in seconds
-- **💬 Real-time Chat** - Built-in WebSocket chat interface for seamless interaction
-- **🔒 Isolated Instances** - Each user gets their own containerized Moltbot instance
-- **📊 Easy Management** - Dashboard to create, monitor, and delete instances
-- **🔐 Secure Authentication** - Powered by [Clerk](https://clerk.com/) for safe, passwordless auth
-- **☁️ Zero Infrastructure Cost** - Runs on [Oracle Cloud Free Tier](https://www.oracle.com/cloud/free/)
+- **Secure Deployment** - Each instance runs in its own isolated environment on a dedicated VPS
+- **Real-time Chat** - Built-in WebSocket chat interface for seamless interaction
+- **One-Click Setup** - Deploy a fully configured OpenClaw instance in seconds
+- **Easy Management** - Dashboard to create, monitor, and delete instances
+- **Authentication** - Powered by [Clerk](https://clerk.com/) for secure auth
 
-## ⚠️ Beta Access
+## Beta Access
 
 SunnyBot is currently in **beta**. New users cannot deploy instances by default.
 
 **To request beta access, contact:** `pluto-software.chirping353@passinbox.com`
 
-Beta access allows you to:
-- Create and manage Moltbot instances
-- Interact with your AI via the built-in chat interface
-- Test the platform before wider release
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
-- **Node.js 22+** (required)
-- **Docker Desktop** (optional, for running containers locally)
+- **Node.js 22+**
 - A [Clerk account](https://dashboard.clerk.com/) (free)
+- A [Convex account](https://convex.dev/) (free)
 
 ### Installation
 
@@ -48,72 +42,53 @@ Beta access allows you to:
 3. **Set up environment variables**
    ```bash
    cp .env.example .env
-   # Edit .env and add your Clerk API keys
+   # Edit .env and add your Clerk and Convex keys
    ```
 
-4. **Get Clerk API Keys**
-   - Go to [https://dashboard.clerk.com/](https://dashboard.clerk.com/)
-   - Create a new application named "SunnyBot"
-   - Copy your API keys and add them to `.env`:
-     ```env
-     VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
-     CLERK_SECRET_KEY=sk_test_...
-     ```
-
-5. **Start the app**
+4. **Start the app**
    ```bash
-   npm run dev:all
+   npm run dev
    ```
-   - Frontend: http://localhost:5173
-   - Backend: http://localhost:3001
+   This starts the Vite frontend dev server and Convex backend concurrently.
 
-## 📖 Documentation
+## Tech Stack
 
-For detailed architecture, development setup, and deployment instructions, see [CLAUDE.md](./CLAUDE.md).
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS v4
+- **Auth**: Clerk
+- **Backend**: Convex (serverless)
+- **Analytics**: PostHog
+- **Routing**: React Router
 
-## 🛠️ Development
+## Development
 
 ### Available Commands
 
-**Frontend (React + Vite)**
 ```bash
-npm run dev        # Start dev server (port 5173)
-npm run build      # Build for production
-npm run preview    # Preview production build
-npm run lint       # Run ESLint
-```
-
-**Backend (Express + Node.js)**
-```bash
-npm run dev:server # Start backend with hot reload (port 3001)
-npm run build:server # Compile TypeScript
-npm run start      # Run production server
-```
-
-**Both**
-```bash
-npm run dev:all    # Run frontend and backend simultaneously
+npm run dev          # Run frontend + Convex backend concurrently
+npm run dev:frontend # Vite dev server only
+npm run dev:convex   # Convex backend dev only
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
 ```
 
 ### Project Structure
 
 ```
-clawdhost/
+sunnybot/
 ├── src/                    # React frontend
-│   ├── pages/             # Landing, Dashboard, Chat, Auth pages
-│   ├── components/        # Reusable UI components
-│   ├── hooks/             # Custom React hooks (useWebSocket)
-│   └── lib/               # Utilities (API client)
-├── server/                # Express backend
-│   ├── routes/            # API endpoints
-│   ├── services/          # Docker & WebSocket services
-│   └── db/                # SQLite database
-├── terraform/             # Infrastructure as Code
-│   └── infra/             # Oracle Cloud configuration
-└── CLAUDE.md             # Detailed architecture docs
+│   ├── pages/              # Home, Dashboard, Chat, Roadmap, Auth pages
+│   ├── components/         # UI components (chat, dashboard, layout)
+│   └── hooks/              # Custom React hooks (useWebSocket)
+├── convex/                 # Convex backend
+│   ├── schema.ts           # Database schema
+│   ├── instances.ts        # Instance management functions
+│   └── railway.ts          # Railway deployment integration
+├── terraform/              # Infrastructure as Code
+└── CLAUDE.md               # Architecture docs
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit pull requests.
 
@@ -123,29 +98,29 @@ Contributions are welcome! Please feel free to submit pull requests.
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **Can't create instances?**
 - Check if you have beta access (contact `pluto-software.chirping353@passinbox.com`)
-- Ensure your Clerk keys are configured in `.env`
-
-**WebSocket connection failing?**
-- Make sure the backend is running (`npm run dev:server`)
-- Check that port 3001 is not in use
-- Browser console will show connection errors
+- Ensure your Clerk and Convex keys are configured in `.env`
 
 **Build errors?**
 - Run `npm install` to ensure all dependencies are installed
 - Check that you're using Node.js 22+: `node --version`
 
-## 📧 Support
+## Links
+
+- [OpenClaw](https://openclaw.ai/) - The AI chatbot SunnyBot deploys
+- [SunnyBot on GitHub](https://github.com/MalikElate/clawdhost)
+
+## Support
 
 For questions, issues, or feature requests, contact: `pluto-software.chirping353@passinbox.com`
 
 ---
 
-Built with 🌻 by the SunnyBot team. Powered by [Moltbot](https://molt.bot/).
+Built with SunnyBot. Powered by [OpenClaw](https://openclaw.ai/).

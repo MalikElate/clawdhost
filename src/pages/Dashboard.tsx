@@ -1,57 +1,28 @@
-import { useState, useEffect } from 'react'
 import { useUser } from '@clerk/clerk-react'
+import { useQuery, useMutation } from 'convex/react'
+import { api } from '../../convex/_generated/api'
 import Sidebar from '../components/layout/Sidebar'
 import Header from '../components/layout/Header'
 import InstanceCard from '../components/dashboard/InstanceCard'
 import CreateInstanceModal from '../components/dashboard/CreateInstanceModal'
 import BetaAccessBanner from '../components/dashboard/BetaAccessBanner'
-
-interface Instance {
-  id: string
-  name: string
-  status: 'running' | 'stopped' | 'creating' | 'error'
-  createdAt: string
-}
+import { useState } from 'react'
 
 const BETA_CONTACT_EMAIL = 'pluto-software.chirping353@passinbox.com'
 
 export default function Dashboard() {
   const { user } = useUser()
-  const [instances, setInstances] = useState<Instance[]>([])
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
 
   const hasBetaAccess = user?.publicMetadata?.beta_access === true
 
-  useEffect(() => {
-    fetchInstances()
-  }, [])
-
-  async function fetchInstances() {
-    try {
-      const res = await fetch('/api/instances')
-      if (res.ok) {
-        const data = await res.json()
-        setInstances(data)
-      }
-    } catch (error) {
-      console.error('Failed to fetch instances:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const instances = useQuery(api.instances.list)
+  const createInstance = useMutation(api.instances.create)
+  const removeInstance = useMutation(api.instances.remove)
 
   async function handleCreateInstance(name: string) {
     try {
-      const res = await fetch('/api/instances', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name }),
-      })
-      if (res.ok) {
-        const newInstance = await res.json()
-        setInstances([...instances, newInstance])
-      }
+      await createInstance({ name })
     } catch (error) {
       console.error('Failed to create instance:', error)
     }
@@ -60,14 +31,13 @@ export default function Dashboard() {
 
   async function handleDeleteInstance(id: string) {
     try {
-      const res = await fetch(`/api/instances/${id}`, { method: 'DELETE' })
-      if (res.ok) {
-        setInstances(instances.filter((i) => i.id !== id))
-      }
+      await removeInstance({ instanceId: id as any })
     } catch (error) {
       console.error('Failed to delete instance:', error)
     }
   }
+
+  const isLoading = instances === undefined
 
   return (
     <div className="min-h-screen bg-slate-900 flex">
