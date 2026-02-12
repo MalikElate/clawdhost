@@ -68,12 +68,12 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
 
         // Handle connect response (hello-ok) — fetch history then mark connected
         if (data.type === 'res' && data.ok && data.payload?.type === 'hello-ok') {
-          // Fetch chat history for this session
+          // Fetch chat history via sessions.preview (chat.history doesn't persist webchat messages)
           ws.send(JSON.stringify({
             type: 'req',
             id: '__history__',
-            method: 'chat.history',
-            params: { sessionKey: SESSION_KEY },
+            method: 'sessions.preview',
+            params: { keys: [SESSION_KEY] },
           }))
           connectedRef.current = true
           setIsConnected(true)
@@ -81,27 +81,27 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
           return
         }
 
-        // Handle history response
+        // Handle history response from sessions.preview
         if (data.type === 'res' && data.id === '__history__' && data.ok) {
-          const historyMessages: Message[] = (data.payload?.messages || [])
-            .filter((m: any) => m.role === 'user' || m.role === 'assistant')
-            .map((m: any) => ({
-              id: m.id || crypto.randomUUID(),
-              role: m.role as 'user' | 'assistant',
-              content: m.content
-                ?.filter((c: any) => c.type === 'text')
-                .map((c: any) => c.text)
-                .join('') ?? '',
-              timestamp: new Date(m.timestamp || Date.now()),
-            }))
-            .filter((m: Message) => m.content.length > 0)
+          const preview = data.payload?.previews?.[0]
+          if (preview?.status === 'ok' && preview.items) {
+            const historyMessages: Message[] = preview.items
+              .filter((m: any) => m.role === 'user' || m.role === 'assistant')
+              .map((m: any) => ({
+                id: crypto.randomUUID(),
+                role: m.role as 'user' | 'assistant',
+                content: (m.text ?? '').replace(/\n\[message_id: [^\]]+\]$/, ''),
+                timestamp: new Date(),
+              }))
+              .filter((m: Message) => m.content.length > 0)
 
-          if (historyMessages.length > 0) {
-            setMessages((prev) => {
-              // Don't duplicate if we already have messages (e.g. reconnect)
-              if (prev.length > 0) return prev
-              return historyMessages
-            })
+            if (historyMessages.length > 0) {
+              setMessages((prev) => {
+                // Don't duplicate if we already have messages (e.g. reconnect)
+                if (prev.length > 0) return prev
+                return historyMessages
+              })
+            }
           }
           return
         }
