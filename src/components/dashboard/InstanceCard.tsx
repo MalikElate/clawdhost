@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 interface Instance {
@@ -28,6 +29,8 @@ const statusLabels = {
 }
 
 export default function InstanceCard({ instance, onDelete }: InstanceCardProps) {
+  const [confirming, setConfirming] = useState(false)
+
   return (
     <div className="rounded-xl bg-slate-800/50 border border-slate-700/50 p-6">
       <div className="flex items-start justify-between mb-4">
@@ -66,12 +69,30 @@ export default function InstanceCard({ instance, onDelete }: InstanceCardProps) 
             Start
           </button>
         )}
-        <button
-          onClick={onDelete}
-          className="rounded-lg border border-red-600/50 px-4 py-2 text-red-400 hover:bg-red-600/20 transition"
-        >
-          Delete
-        </button>
+        {confirming ? (
+          <>
+            <span className="text-sm text-red-400">Are you sure?</span>
+            <button
+              onClick={() => { onDelete(); setConfirming(false) }}
+              className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-500 transition"
+            >
+              Yes, delete
+            </button>
+            <button
+              onClick={() => setConfirming(false)}
+              className="rounded-lg border border-slate-600 px-4 py-2 text-slate-400 hover:bg-slate-700 transition"
+            >
+              Cancel
+            </button>
+          </>
+        ) : (
+          <button
+            onClick={() => setConfirming(true)}
+            className="rounded-lg border border-red-600/50 px-4 py-2 text-red-400 hover:bg-red-600/20 transition"
+          >
+            Delete
+          </button>
+        )}
       </div>
     </div>
   )

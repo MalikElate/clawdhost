@@ -17,30 +17,27 @@ export default function ChatWindow({ instanceId, serviceUrl, gatewayToken }: Cha
 
   return (
     <div className="flex-1 flex flex-col rounded-xl bg-slate-800/50 border border-slate-700/50 overflow-hidden">
-      {/* Connection Status */}
+      {/* Connection status */}
       <div className="px-4 py-2 border-b border-slate-700/50 flex items-center gap-2">
         <span
           className={`w-2 h-2 rounded-full ${
-            isConnecting
-              ? 'bg-yellow-500 animate-pulse'
-              : isConnected
+            isConnected
               ? 'bg-green-500'
-              : 'bg-red-500'
+              : isConnecting
+                ? 'bg-yellow-500 animate-pulse'
+                : 'bg-red-500'
           }`}
         />
         <span className="text-sm text-slate-400">
-          {isConnecting
-            ? 'Connecting...'
-            : isConnected
+          {isConnected
             ? 'Connected'
-            : 'Disconnected'}
+            : isConnecting
+              ? 'Connecting...'
+              : 'Disconnected'}
         </span>
       </div>
 
-      {/* Messages */}
       <MessageList messages={messages} />
-
-      {/* Input */}
       <MessageInput onSend={sendMessage} disabled={!isConnected} />
     </div>
   )

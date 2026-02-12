@@ -5,7 +5,7 @@ import { internalAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 
 const RAILWAY_API_URL = "https://backboard.railway.com/graphql/v2";
-const MOLTBOT_IMAGE = "moltbot/moltbot:latest";
+const MOLTBOT_IMAGE = "ghcr.io/malikelate/moltbot-image:latest";
 
 interface GraphQLResponse<T = any> {
   data?: T;
@@ -112,9 +112,11 @@ export const deploy = internalAction({
             serviceId,
             environmentId,
             variables: {
+              PORT: "18789",
               INSTANCE_ID: args.instanceId,
               USER_ID: args.userId,
               CLAWDBOT_GATEWAY_TOKEN: args.gatewayToken,
+              OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY ?? "",
             },
           },
         }
