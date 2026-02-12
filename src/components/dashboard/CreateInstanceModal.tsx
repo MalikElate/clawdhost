@@ -1,9 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface CreateInstanceModalProps {
   isOpen: boolean
   onClose: () => void
   onCreate: (name: string) => void
+}
+
+const ANIMALS = [
+  'bear', 'whale', 'eagle', 'fox', 'wolf', 'hawk', 'lynx', 'orca',
+  'puma', 'raven', 'shark', 'tiger', 'viper', 'bison', 'crane',
+  'falcon', 'heron', 'otter', 'panther', 'cobra',
+]
+
+function generateRandomName(): string {
+  const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)]
+  const number = Math.floor(Math.random() * 900) + 100
+  return `${animal}-${number}`
 }
 
 export default function CreateInstanceModal({
@@ -13,6 +25,12 @@ export default function CreateInstanceModal({
 }: CreateInstanceModalProps) {
   const [name, setName] = useState('')
   const [isCreating, setIsCreating] = useState(false)
+
+  useEffect(() => {
+    if (isOpen) {
+      setName(generateRandomName())
+    }
+  }, [isOpen])
 
   if (!isOpen) return null
 
@@ -32,7 +50,7 @@ export default function CreateInstanceModal({
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-slate-800 rounded-xl border border-slate-700/50 p-6 w-full max-w-md">
+      <div className="relative bg-slate-800 rounded-xl border border-slate-700/50 p-6 w-full max-w-md mx-4">
         <h2 className="text-xl font-bold text-white mb-4">
           Create New Instance
         </h2>

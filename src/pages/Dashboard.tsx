@@ -13,6 +13,7 @@ const BETA_CONTACT_EMAIL = 'pluto-software.chirping353@passinbox.com'
 export default function Dashboard() {
   const { user } = useUser()
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const hasBetaAccess = user?.publicMetadata?.beta_access === true
 
@@ -41,15 +42,15 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <main className="flex-1 p-6">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <main className="flex-1 p-4 sm:p-6">
           {!hasBetaAccess && (
             <BetaAccessBanner contactEmail={BETA_CONTACT_EMAIL} />
           )}
 
-          <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center justify-between gap-4 mb-6">
             <h1 className="text-2xl font-bold text-white">Your Instances</h1>
             <button
               onClick={() => setIsModalOpen(true)}

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from 'convex/react'
 import { api } from '../../convex/_generated/api'
@@ -11,6 +12,7 @@ export default function Chat() {
     api.instances.getStatus,
     instanceId ? { instanceId: instanceId as any } : "skip"
   )
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   if (!instanceId) {
     return (
@@ -30,10 +32,10 @@ export default function Chat() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex">
-      <Sidebar />
-      <div className="flex-1 flex flex-col">
-        <Header />
-        <main className="flex-1 flex flex-col p-6">
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <main className="flex-1 flex flex-col p-4 sm:p-6">
           <div className="flex items-center gap-4 mb-4">
             <Link
               to="/dashboard"

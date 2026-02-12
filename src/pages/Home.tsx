@@ -47,7 +47,7 @@ export default function Home() {
                 to="/sign-up"
                 className="rounded-lg bg-brand-600 px-8 py-3 text-lg font-semibold text-white hover:bg-brand-500 transition"
               >
-                Get Started
+                Deploy Your Bot
               </Link>
             </SignedOut>
             <SignedIn>
