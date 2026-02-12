@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 
 export interface Message {
   id: string
-  role: 'user' | 'assistant'
+  role: 'user' | 'assistant' | 'system'
   content: string
   timestamp: Date
 }
@@ -13,15 +13,21 @@ interface UseWebSocketOptions {
   gatewayToken?: string
 }
 
+const SESSION_KEY = 'main'
+const RECONNECT_DELAY_MS = 3000
+const MAX_RECONNECT_ATTEMPTS = 10
+
 export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSocketOptions) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isConnected, setIsConnected] = useState(false)
   const [isConnecting, setIsConnecting] = useState(true)
   const wsRef = useRef<WebSocket | null>(null)
   const connectedRef = useRef(false)
+  const reconnectAttempts = useRef(0)
+  const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const intentionalClose = useRef(false)
 
-  useEffect(() => {
-    // Connect to the root path (moltbot gateway serves WebSocket at /)
+  const connect = useCallback(() => {
     const wsUrl = serviceUrl.replace(/^https:/, 'wss:').replace(/^http:/, 'ws:')
 
     setIsConnecting(true)
@@ -29,7 +35,7 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
     wsRef.current = ws
 
     ws.onopen = () => {
-      // Don't set connected yet — wait for the connect handshake to complete
+      reconnectAttempts.current = 0
     }
 
     ws.onmessage = (event) => {
@@ -38,7 +44,7 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
 
         // Handle connect.challenge — respond with connect RPC
         if (data.type === 'event' && data.event === 'connect.challenge') {
-          const connectReq = {
+          ws.send(JSON.stringify({
             type: 'req',
             id: crypto.randomUUID(),
             method: 'connect',
@@ -56,33 +62,63 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
               scopes: ['operator.admin'],
               caps: [],
             },
-          }
-          ws.send(JSON.stringify(connectReq))
+          }))
           return
         }
 
-        // Handle connect response (hello-ok)
+        // Handle connect response (hello-ok) — fetch history then mark connected
         if (data.type === 'res' && data.ok && data.payload?.type === 'hello-ok') {
+          // Fetch chat history for this session
+          ws.send(JSON.stringify({
+            type: 'req',
+            id: '__history__',
+            method: 'chat.history',
+            params: { sessionKey: SESSION_KEY },
+          }))
           connectedRef.current = true
           setIsConnected(true)
           setIsConnecting(false)
           return
         }
 
+        // Handle history response
+        if (data.type === 'res' && data.id === '__history__' && data.ok) {
+          const historyMessages: Message[] = (data.payload?.messages || [])
+            .filter((m: any) => m.role === 'user' || m.role === 'assistant')
+            .map((m: any) => ({
+              id: m.id || crypto.randomUUID(),
+              role: m.role as 'user' | 'assistant',
+              content: m.content
+                ?.filter((c: any) => c.type === 'text')
+                .map((c: any) => c.text)
+                .join('') ?? '',
+              timestamp: new Date(m.timestamp || Date.now()),
+            }))
+            .filter((m: Message) => m.content.length > 0)
+
+          if (historyMessages.length > 0) {
+            setMessages((prev) => {
+              // Don't duplicate if we already have messages (e.g. reconnect)
+              if (prev.length > 0) return prev
+              return historyMessages
+            })
+          }
+          return
+        }
+
         // Handle connect failure
-        if (data.type === 'res' && data.ok === false) {
-          console.error('Gateway connect failed:', data.error?.message)
+        if (data.type === 'res' && data.ok === false && data.id !== '__history__') {
+          console.error('Gateway error:', data.error?.message)
           setIsConnecting(false)
           return
         }
 
-        // Handle chat events (streaming responses)
+        // Handle chat events from ANY session (including cron notifications)
         if (data.type === 'event' && data.event === 'chat') {
           const payload = data.payload
           if (!payload) return
 
           if (payload.state === 'delta') {
-            // Streaming delta — payload contains full text so far (not incremental)
             const text = payload.message?.content
               ?.filter((c: any) => c.type === 'text')
               .map((c: any) => c.text)
@@ -108,7 +144,6 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
               ]
             })
           } else if (payload.state === 'final') {
-            // Final message — replace with complete content
             const text = payload.message?.content
               ?.filter((c: any) => c.type === 'text')
               .map((c: any) => c.text)
@@ -146,8 +181,6 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
           }
           return
         }
-
-        // Ignore tick events and other events silently
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error)
       }
@@ -157,19 +190,31 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
       connectedRef.current = false
       setIsConnected(false)
       setIsConnecting(false)
+
+      // Auto-reconnect unless intentionally closed
+      if (!intentionalClose.current && reconnectAttempts.current < MAX_RECONNECT_ATTEMPTS) {
+        reconnectAttempts.current++
+        reconnectTimer.current = setTimeout(connect, RECONNECT_DELAY_MS)
+      }
     }
 
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error)
+    ws.onerror = () => {
       connectedRef.current = false
       setIsConnected(false)
       setIsConnecting(false)
     }
+  }, [serviceUrl, gatewayToken])
+
+  useEffect(() => {
+    intentionalClose.current = false
+    connect()
 
     return () => {
-      ws.close()
+      intentionalClose.current = true
+      if (reconnectTimer.current) clearTimeout(reconnectTimer.current)
+      wsRef.current?.close()
     }
-  }, [instanceId, serviceUrl, gatewayToken])
+  }, [instanceId, connect])
 
   const sendMessage = useCallback((content: string) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN || !connectedRef.current) {
@@ -179,7 +224,6 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
 
     const idempotencyKey = crypto.randomUUID()
 
-    // Add user message to the list
     const message: Message = {
       id: idempotencyKey,
       role: 'user',
@@ -188,14 +232,13 @@ export function useWebSocket({ instanceId, serviceUrl, gatewayToken }: UseWebSoc
     }
     setMessages((prev) => [...prev, message])
 
-    // Send chat.send RPC
     wsRef.current.send(
       JSON.stringify({
         type: 'req',
         id: crypto.randomUUID(),
         method: 'chat.send',
         params: {
-          sessionKey: 'default',
+          sessionKey: SESSION_KEY,
           message: content,
           idempotencyKey,
         },
