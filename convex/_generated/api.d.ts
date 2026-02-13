@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as apps from "../apps.js";
 import type * as instances from "../instances.js";
 import type * as railway from "../railway.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  apps: typeof apps;
   instances: typeof instances;
   railway: typeof railway;
 }>;

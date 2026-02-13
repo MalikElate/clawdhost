@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from 'convex/react'
+import { useQuery, useMutation } from 'convex/react'
 import { api } from '../../convex/_generated/api'
 import Sidebar from '../components/layout/Sidebar'
 import Header from '../components/layout/Header'
 import ChatWindow from '../components/chat/ChatWindow'
+import CreateAppModal from '../components/apps/CreateAppModal'
 
 export default function Chat() {
   const { instanceId } = useParams<{ instanceId: string }>()
@@ -13,6 +14,8 @@ export default function Chat() {
     instanceId ? { instanceId: instanceId as any } : "skip"
   )
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [createAppModalOpen, setCreateAppModalOpen] = useState(false)
+  const createApp = useMutation(api.apps.create)
 
   if (!instanceId) {
     return (
@@ -32,7 +35,7 @@ export default function Chat() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onCreateApp={() => setCreateAppModalOpen(true)} />
       <div className="flex-1 flex flex-col min-w-0">
         <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
         <main className="flex-1 flex flex-col p-4 sm:p-6">
@@ -58,6 +61,15 @@ export default function Chat() {
           )}
         </main>
       </div>
+
+      <CreateAppModal
+        isOpen={createAppModalOpen}
+        onClose={() => setCreateAppModalOpen(false)}
+        onCreate={async (name, type) => {
+          await createApp({ name, type })
+          setCreateAppModalOpen(false)
+        }}
+      />
     </div>
   )
 }

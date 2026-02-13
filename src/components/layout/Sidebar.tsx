@@ -1,16 +1,24 @@
 import { Link, useLocation } from 'react-router-dom'
+import { useQuery } from 'convex/react'
+import { api } from '../../../convex/_generated/api'
 
 const navItems = [
   { path: '/dashboard', label: 'Instances', icon: '🖥️' },
 ]
 
+const appTypeIcons: Record<string, string> = {
+  todo: '📋',
+}
+
 interface SidebarProps {
   isOpen: boolean
   onClose: () => void
+  onCreateApp?: () => void
 }
 
-export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onCreateApp }: SidebarProps) {
   const location = useLocation()
+  const apps = useQuery(api.apps.list)
 
   return (
     <>
@@ -46,7 +54,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </svg>
           </button>
         </div>
-        <nav className="flex-1 p-4">
+        <nav className="flex-1 p-4 overflow-y-auto">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.path}>
@@ -65,6 +73,47 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               </li>
             ))}
           </ul>
+
+          {/* Apps section */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between px-3 mb-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Apps
+              </span>
+              {onCreateApp && (
+                <button
+                  onClick={onCreateApp}
+                  className="text-slate-500 hover:text-brand-400 transition text-lg leading-none"
+                  title="New App"
+                >
+                  +
+                </button>
+              )}
+            </div>
+            <ul className="space-y-1">
+              {apps?.map((app) => (
+                <li key={app.id}>
+                  <Link
+                    to={`/apps/${app.id}`}
+                    onClick={onClose}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg transition text-sm ${
+                      location.pathname === `/apps/${app.id}`
+                        ? 'bg-brand-600/20 text-brand-400'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-700/50'
+                    }`}
+                  >
+                    <span>{appTypeIcons[app.type] ?? '📦'}</span>
+                    <span className="truncate">{app.name}</span>
+                  </Link>
+                </li>
+              ))}
+              {apps !== undefined && apps.length === 0 && (
+                <li className="px-3 py-2 text-xs text-slate-600">
+                  No apps yet
+                </li>
+              )}
+            </ul>
+          </div>
         </nav>
         <div className="p-4 border-t border-slate-700/50">
           <a

@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Roadmap from './pages/Roadmap'
 import Dashboard from './pages/Dashboard'
 import Chat from './pages/Chat'
+import AppView from './pages/AppView'
 import SignIn from './pages/SignIn'
 import SignUp from './pages/SignUp'
 
@@ -39,6 +40,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Chat />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/apps/:appId"
+          element={
+            <ProtectedRoute>
+              <AppView />
             </ProtectedRoute>
           }
         />

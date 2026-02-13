@@ -4,15 +4,18 @@ import Sidebar from '../components/layout/Sidebar'
 import Header from '../components/layout/Header'
 import InstanceCard from '../components/dashboard/InstanceCard'
 import CreateInstanceModal from '../components/dashboard/CreateInstanceModal'
+import CreateAppModal from '../components/apps/CreateAppModal'
 import { useState } from 'react'
 
 export default function Dashboard() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [createAppModalOpen, setCreateAppModalOpen] = useState(false)
 
   const instances = useQuery(api.instances.list)
   const createInstance = useMutation(api.instances.create)
   const removeInstance = useMutation(api.instances.remove)
+  const createApp = useMutation(api.apps.create)
 
   async function handleCreateInstance(name: string) {
     try {
@@ -35,7 +38,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-900 flex">
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} onCreateApp={() => setCreateAppModalOpen(true)} />
       <div className="flex-1 flex flex-col min-w-0">
         <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
         <main className="flex-1 p-4 sm:p-6">
@@ -88,6 +91,15 @@ export default function Dashboard() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreate={handleCreateInstance}
+      />
+
+      <CreateAppModal
+        isOpen={createAppModalOpen}
+        onClose={() => setCreateAppModalOpen(false)}
+        onCreate={async (name, type) => {
+          await createApp({ name, type })
+          setCreateAppModalOpen(false)
+        }}
       />
     </div>
   )
