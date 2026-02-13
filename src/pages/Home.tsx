@@ -6,10 +6,8 @@ import PublicHeader from '../components/layout/PublicHeader'
 import ChatWindow from '../components/chat/ChatWindow'
 
 export default function Home() {
-  const { isSignedIn, user } = useUser()
+  const { isSignedIn } = useUser()
   const { isLoaded } = useAuth()
-
-  const hasBetaAccess = user?.publicMetadata?.beta_access === true
 
   const instances = useQuery(
     api.instances.list,
@@ -132,8 +130,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Chat section for beta users with running instances */}
-      {isSignedIn && hasBetaAccess && activeInstance?.serviceUrl && (
+      {/* Chat section for signed-in users with running instances */}
+      {isSignedIn && activeInstance?.serviceUrl && (
         <section className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="mx-auto max-w-4xl">
             <h2 className="text-xl font-semibold text-white mb-4">Your Instance</h2>
